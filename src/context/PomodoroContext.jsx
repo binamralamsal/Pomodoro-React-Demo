@@ -1,7 +1,6 @@
 import { createContext, useRef, useState } from "react";
 import successSound from "../assets/sounds/success.mp3";
-import modeChangedSound from "../assets/sounds/mode-changed.mp3";
-
+import lofiMusic from "../assets/lofi/missing-you.mp3";
 export const PomodoroContext = createContext();
 
 const PomodoroProvider = ({ children }) => {
@@ -17,7 +16,9 @@ const PomodoroProvider = ({ children }) => {
   const [isPaused, setIsPaused] = useState(true);
   const isPausedRef = useRef(isPaused);
   const [isCompleted, setIsCompleted] = useState(false);
-  const audioRef = useRef();
+
+  const modeChangeAudioRef = useRef();
+  const lofiMusicRef = useRef();
 
   const [mode, setMode] = useState("work");
   const modeRef = useRef(mode);
@@ -32,6 +33,9 @@ const PomodoroProvider = ({ children }) => {
     setIsCompleted(false);
     setIsPaused((prevState) => !prevState);
     isPausedRef.current = !isPaused;
+
+    if (mode === "work") lofiMusicRef.current.play();
+    if (isPausedRef.current) lofiMusicRef.current.pause();
   };
 
   const handleCompleted = () => {
@@ -39,7 +43,8 @@ const PomodoroProvider = ({ children }) => {
     setIsPaused(true);
     isPausedRef.current = true;
 
-    audioRef.current.play();
+    modeChangeAudioRef.current.play();
+    lofiMusicRef.current.pause();
   };
 
   const contextValue = {
@@ -48,13 +53,15 @@ const PomodoroProvider = ({ children }) => {
     modeState: { mode, setMode, modeRef },
     actions: { handlePauseBtnClick, handleCompleted },
     pomodoroDetails: pomodoroDetailsRef.current,
+    lofiMusicRef,
     isCompleted,
   };
 
   return (
     <PomodoroContext.Provider value={contextValue}>
       {children}
-      <audio src={successSound} ref={audioRef}></audio>
+      <audio src={successSound} ref={modeChangeAudioRef}></audio>
+      <audio src={lofiMusic} ref={lofiMusicRef} loop={true} controls></audio>
     </PomodoroContext.Provider>
   );
 };

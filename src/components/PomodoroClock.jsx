@@ -5,8 +5,14 @@ import { PomodoroContext } from "../context/PomodoroContext";
 import modeChangedSound from "../assets/sounds/mode-changed.mp3";
 
 const PomodoroClock = () => {
-  const { pomodoroSettings, modeState, actions, pomodoroDetails, pauseState } =
-    useContext(PomodoroContext);
+  const {
+    pomodoroSettings,
+    modeState,
+    actions,
+    pomodoroDetails,
+    pauseState,
+    lofiMusicRef,
+  } = useContext(PomodoroContext);
   const { workMinutes, breakMinutes, totalMinutes } = pomodoroSettings;
   const { mode, setMode, modeRef } = modeState;
   const { isPausedRef } = pauseState;
@@ -38,6 +44,9 @@ const PomodoroClock = () => {
 
     const nextMode = modeRef.current === "work" ? "break" : "work";
 
+    if (nextMode === "break") lofiMusicRef.current.pause();
+    else lofiMusicRef.current.play();
+
     let remainingWorkMinutes = workMinutes;
     const isOnlyOneWorkRemaining =
       pomodoroDetails.remainingWorkParts === 1 &&
@@ -58,7 +67,6 @@ const PomodoroClock = () => {
     setSecondsLeft(nextSeconds);
     secondsLeftRef.current = nextSeconds;
 
-    console.log("PLaying audio");
     audioRef.current.play();
   };
 
@@ -70,7 +78,7 @@ const PomodoroClock = () => {
       if (isPausedRef.current) return;
       if (secondsLeftRef.current === 0) return switchMode();
       tick();
-    }, 1000);
+    }, 10);
 
     return () => clearInterval(interval);
   }, []);

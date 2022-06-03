@@ -1,4 +1,4 @@
-import { PomodoroClock } from "../components";
+import { MusicPlayer, PomodoroClock } from "../components";
 import { useContext } from "react";
 import { PomodoroContext } from "../context/PomodoroContext";
 
@@ -12,6 +12,7 @@ const Pomodoro = () => {
       <button onClick={actions.handlePauseBtnClick}>
         {pauseState.isPaused ? "Play" : "Pause"}
       </button>
+      <MusicPlayer />
       <h2>Total Minutes: {pomodoroSettings.totalMinutes}</h2>
       {isCompleted && <h1>Completed</h1>}
     </>
