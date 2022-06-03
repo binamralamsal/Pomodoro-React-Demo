@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { PomodoroContext } from "../context/PomodoroContext";
+import modeChangedSound from "../assets/sounds/mode-changed.mp3";
 
 const PomodoroClock = () => {
   const { pomodoroSettings, modeState, actions, pomodoroDetails, pauseState } =
@@ -12,6 +13,7 @@ const PomodoroClock = () => {
 
   const [secondsLeft, setSecondsLeft] = useState(0);
   const secondsLeftRef = useRef(secondsLeft);
+  const audioRef = useRef();
 
   const tick = () => {
     secondsLeftRef.current--;
@@ -55,6 +57,9 @@ const PomodoroClock = () => {
 
     setSecondsLeft(nextSeconds);
     secondsLeftRef.current = nextSeconds;
+
+    console.log("PLaying audio");
+    audioRef.current.play();
   };
 
   useEffect(() => {
@@ -87,6 +92,7 @@ const PomodoroClock = () => {
           pathColor: mode === "work" ? "#1fbe63" : "#ff5252",
         })}
       />
+      <audio src={modeChangedSound} ref={audioRef}></audio>
     </div>
   );
 };

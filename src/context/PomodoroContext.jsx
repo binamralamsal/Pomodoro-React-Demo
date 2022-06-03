@@ -1,11 +1,13 @@
 import { createContext, useRef, useState } from "react";
+import successSound from "../assets/sounds/success.mp3";
+import modeChangedSound from "../assets/sounds/mode-changed.mp3";
 
 export const PomodoroContext = createContext();
 
 const PomodoroProvider = ({ children }) => {
   const workMinutes = 25;
   const breakMinutes = 5;
-  const totalMinutes = 59;
+  const totalMinutes = 120;
 
   const totalWorkParts = Math.ceil(totalMinutes / (workMinutes + breakMinutes));
   const totalBreakParts = Math.floor(
@@ -15,6 +17,7 @@ const PomodoroProvider = ({ children }) => {
   const [isPaused, setIsPaused] = useState(true);
   const isPausedRef = useRef(isPaused);
   const [isCompleted, setIsCompleted] = useState(false);
+  const audioRef = useRef();
 
   const [mode, setMode] = useState("work");
   const modeRef = useRef(mode);
@@ -35,6 +38,8 @@ const PomodoroProvider = ({ children }) => {
     setIsCompleted(true);
     setIsPaused(true);
     isPausedRef.current = true;
+
+    audioRef.current.play();
   };
 
   const contextValue = {
@@ -49,6 +54,7 @@ const PomodoroProvider = ({ children }) => {
   return (
     <PomodoroContext.Provider value={contextValue}>
       {children}
+      <audio src={successSound} ref={audioRef}></audio>
     </PomodoroContext.Provider>
   );
 };
