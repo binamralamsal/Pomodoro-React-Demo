@@ -78,7 +78,7 @@ const PomodoroClock = () => {
       if (isPausedRef.current) return;
       if (secondsLeftRef.current === 0) return switchMode();
       tick();
-    }, 10);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);

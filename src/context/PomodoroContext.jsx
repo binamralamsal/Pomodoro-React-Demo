@@ -1,6 +1,5 @@
 import { createContext, useRef, useState } from "react";
 import successSound from "../assets/sounds/success.mp3";
-import lofiMusic from "../assets/lofi/missing-you.mp3";
 export const PomodoroContext = createContext();
 
 const PomodoroProvider = ({ children }) => {
@@ -61,7 +60,6 @@ const PomodoroProvider = ({ children }) => {
     <PomodoroContext.Provider value={contextValue}>
       {children}
       <audio src={successSound} ref={modeChangeAudioRef}></audio>
-      <audio src={lofiMusic} ref={lofiMusicRef} loop={true} controls></audio>
     </PomodoroContext.Provider>
   );
 };
