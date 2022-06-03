@@ -1,30 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { PomodoroContext } from "../context/PomodoroContext";
 
-const PomodoroClock = ({
-  workMinutes = 25,
-  breakMinutes = 5,
-  isPausedRef,
-  onComplete,
-  totalMinutes,
-}) => {
-  const [mode, setMode] = useState("work");
+const PomodoroClock = () => {
+  const { pomodoroSettings, modeState, actions, pomodoroDetails, pauseState } =
+    useContext(PomodoroContext);
+  const { workMinutes, breakMinutes, totalMinutes } = pomodoroSettings;
+  const { mode, setMode, modeRef } = modeState;
+  const { isPausedRef } = pauseState;
+
   const [secondsLeft, setSecondsLeft] = useState(0);
-
   const secondsLeftRef = useRef(secondsLeft);
-  const modeRef = useRef(mode);
-
-  const totalWorkParts = Math.ceil(totalMinutes / (workMinutes + breakMinutes));
-  const totalBreakParts = Math.floor(
-    totalMinutes / (workMinutes + breakMinutes)
-  );
-
-  const pomodoroDetailsRef = useRef({
-    remainingWorkParts: totalWorkParts,
-    totalWorks: totalWorkParts,
-    remainingBreakParts: totalBreakParts,
-  });
 
   const tick = () => {
     secondsLeftRef.current--;
@@ -33,35 +20,31 @@ const PomodoroClock = ({
 
   const isCompleted = () => {
     const isWorkAndNoRemainingBreakParts =
-      modeRef.current === "work" &&
-      pomodoroDetailsRef.current.remainingBreakParts === 0;
+      modeRef.current === "work" && pomodoroDetails.remainingBreakParts === 0;
     const isBreakAndNoRemainingWorkParts =
-      modeRef.current === "break" &&
-      pomodoroDetailsRef.current.remainingWorkParts === 0;
+      modeRef.current === "break" && pomodoroDetails.remainingWorkParts === 0;
     return isWorkAndNoRemainingBreakParts || isBreakAndNoRemainingWorkParts;
   };
 
   const switchMode = () => {
     // Decreases remaining working parts or break parts
-    if (modeRef.current === "work")
-      pomodoroDetailsRef.current.remainingWorkParts--;
-    else pomodoroDetailsRef.current.remainingBreakParts--;
+    if (modeRef.current === "work") pomodoroDetails.remainingWorkParts--;
+    else pomodoroDetails.remainingBreakParts--;
 
     // Decides
-    if (isCompleted()) return onComplete();
+    if (isCompleted()) return actions.handleCompleted();
 
     const nextMode = modeRef.current === "work" ? "break" : "work";
 
     let remainingWorkMinutes = workMinutes;
     const isOnlyOneWorkRemaining =
-      pomodoroDetailsRef.current.remainingWorkParts === 1 &&
-      pomodoroDetailsRef.current.remainingBreakParts === 0;
+      pomodoroDetails.remainingWorkParts === 1 &&
+      pomodoroDetails.remainingBreakParts === 0;
     if (nextMode === "work" && isOnlyOneWorkRemaining) {
       // Calculates remaining working minutes if it is the final work part and no break part is remaining
       remainingWorkMinutes =
         totalMinutes -
-        (breakMinutes + workMinutes) *
-          (pomodoroDetailsRef.current.totalWorks - 1);
+        (breakMinutes + workMinutes) * (pomodoroDetails.totalWorks - 1);
     }
 
     const nextSeconds =
@@ -82,7 +65,7 @@ const PomodoroClock = ({
       if (isPausedRef.current) return;
       if (secondsLeftRef.current === 0) return switchMode();
       tick();
-    }, 10);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);

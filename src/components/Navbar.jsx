@@ -33,6 +33,14 @@ const Navbar = () => {
             Register
           </NavLink>
         </li>
+        <li>
+          <NavLink
+            to={"/pomodoro"}
+            style={({ isActive }) => (isActive ? activeStyle : undefined)}
+          >
+            Pomodoro
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
